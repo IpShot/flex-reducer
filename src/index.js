@@ -7,7 +7,7 @@ const cache = {};
 const cacheReducerMap = {};
 const selectors = {};
 const context = {
-  cache: {},
+  state: {},
   dispatch: [],
 };
 
@@ -43,9 +43,9 @@ export function useReducer(reducer, initialState, init, options = { cache: true 
   }
 
   const cacheKey = initialState.__reducer__;
-  const currentCache = context.cache[cacheKey];
+  const contextState = context.state[cacheKey];
 
-  if (currentCache && cacheReducerMap[cacheKey] !== reducer) {
+  if (contextState && cacheReducerMap[cacheKey] !== reducer) {
     throw new Error('initialState.__reducer__ name should be unique.');
   }
 
@@ -56,20 +56,20 @@ export function useReducer(reducer, initialState, init, options = { cache: true 
   );
 
   useEffect(() => {
-    if (!currentCache) {
+    if (!contextState) {
       cacheReducerMap[cacheKey] = reducer;
       context.dispatch.push(disp);
     }
     return () => {
       if (options.cache && !cache[cacheKey]) cache[cacheKey] = state;
       delete cacheReducerMap[cacheKey];
-      delete context.cache[cacheKey];
+      delete context.state[cacheKey];
       removeDispatch(disp);
     }
   }, []);
 
-  context.cache[cacheKey] = state;
-  return [context.cache, dispatch];
+  context.state[cacheKey] = state;
+  return [context.state, dispatch];
 }
 
 export function useSelector(selector) {
@@ -79,8 +79,8 @@ export function useSelector(selector) {
   const key = useRef(genKey());
   const [_, forceRender] = useReactReducer(s => s + 1, 0);
   const selectorRef = useRef(selector);
-  const prevResult = useRef(selectorRef.current(context.cache));
-  const currResult = selector(context.cache);
+  const prevResult = useRef(selectorRef.current(context.state));
+  const currResult = selector(context.state);
 
   if (!shallowEqual(prevResult.current, currResult)) {
     selectorRef.current = selector;
