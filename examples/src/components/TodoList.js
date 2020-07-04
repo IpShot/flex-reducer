@@ -14,10 +14,7 @@ function getFilteredTodos(todos, filter) {
 }
 
 const TodoList = React.memo(() => {
-  const { todos, filter } = useSelector(state => ({
-    todos: state.app.todos,
-    filter: state.app.filter,
-  }));
+  const { todos, filter } = useSelector(state => state.app);
   const filteredTodos = getFilteredTodos(todos, filter);
 
   return (
