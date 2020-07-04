@@ -1,6 +1,6 @@
 import React from "react";
 import cx from "classnames";
-import { useSelector, dispatch } from "../cache-reducer";
+import { useSelector, dispatch } from "../flex-reducer";
 import { setFilter } from "../actions";
 import { VISIBILITY_FILTERS } from "../constants";
 

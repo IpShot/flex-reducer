@@ -1,6 +1,6 @@
 import React from "react";
 import { toggleTodo } from '../actions';
-import { dispatch } from '../cache-reducer';
+import { dispatch } from '../flex-reducer';
 import cx from "classnames";
 
 const Todo = React.memo(({ todo }) => {

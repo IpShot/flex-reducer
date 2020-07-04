@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { dispatch } from "../cache-reducer";
+import { dispatch } from "../flex-reducer";
 import { addTodo } from "../actions";
 
 const AddTodo = () => {
