@@ -6,6 +6,7 @@ import { VISIBILITY_FILTERS } from "../constants";
 
 const VisibilityFilters = () => {
   const filter = useSelector(state => state.app.filter);
+  console.log('Render filters');
   return (
     <div className="visibility-filters">
       {Object.keys(VISIBILITY_FILTERS).map(filterKey => {
