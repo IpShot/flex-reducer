@@ -1,15 +1,17 @@
-import { useReducer as useReactReducer, useRef, useEffect } from 'react';
+import { useReducer, useRef, useEffect } from 'react';
 import shallowEqual from './shallowEqual';
 
 let counter = 0;
 const genKey = () => counter++;
-const cache = {};
-const cacheReducerMap = {};
-const selectors = {};
+let cache = {};
+let cacheReducerMap = {};
+let selectors = {};
 const context = {
   state: {},
   dispatch: [],
 };
+
+Object.seal(context);
 
 function runSelectors() {
   Object.keys(selectors).forEach(key => selectors[key]());
@@ -34,26 +36,33 @@ export function dispatch(action = {}) {
   runSelectors();
 }
 
-export function useReducer(reducer, initialState, init, options = { cache: true }) {
+export function useFlexReducer(reducer, initialState, init, options = { cache: true }) {
   if (!reducer || !initialState) {
     throw new Error('Reducer and initialState arguments are required.');
   }
-  if (!initialState.__reducer__) {
+
+  const initFunc = init || defaultInit;
+  const initState = initFunc(initialState);
+
+  if (!initState.__reducer__) {
     throw new Error('You have to specify initialState.__reducer__ name field.');
   }
 
-  const cacheKey = initialState.__reducer__;
+  const cacheKey = initState.__reducer__;
   const contextState = context.state[cacheKey];
 
   if (contextState && cacheReducerMap[cacheKey] !== reducer) {
     throw new Error('initialState.__reducer__ name should be unique.');
   }
 
-  const [state, disp] = useReactReducer(
+  const [state, disp] = useReducer(
     reducer,
-    options.cache && cache[cacheKey] || initialState,
-    init || defaultInit
+    options.cache && cache[cacheKey]?.current || initialState,
+    initFunc
   );
+
+  const lastState = useRef();
+  lastState.current = state;
 
   useEffect(() => {
     if (!contextState) {
@@ -61,12 +70,12 @@ export function useReducer(reducer, initialState, init, options = { cache: true 
       context.dispatch.push(disp);
     }
     return () => {
-      if (options.cache && !cache[cacheKey]) cache[cacheKey] = state;
+      if (options.cache && !cache[cacheKey]) cache[cacheKey] = lastState;
       delete cacheReducerMap[cacheKey];
       delete context.state[cacheKey];
       removeDispatch(disp);
     }
-  }, []);
+  }, [cacheKey]);
 
   context.state[cacheKey] = state;
   return [context.state, dispatch];
@@ -77,7 +86,7 @@ export function useSelector(selector) {
     throw new Error('Selector must be a function.');
   }
   const key = useRef(genKey());
-  const [_, forceRender] = useReactReducer(s => s + 1, 0);
+  const [_, forceRender] = useReducer(s => s + 1, 0);
   const selectorRef = useRef(selector);
   const prevResult = useRef(selectorRef.current(context.state));
   const currResult = selector(context.state);
@@ -90,15 +99,41 @@ export function useSelector(selector) {
   useEffect(() => {
     selectors[key.current] = forceRender;
     return () => delete selectors[key.current];
-  }, [selectors, key.current, forceRender]);
+  }, [key.current]);
 
   return currResult;
 }
+
+//----------------------------------
+//   DANGEROUS ZONE!!!
+//   SUPPOSE TO USE FOR TESTING ONLY
+//----------------------------------
 
 export function getCache() {
   return cache;
 }
 
+export function getState() {
+  return context.state;
+}
+
 export function getContext() {
   return context;
+}
+
+export function resetCache() {
+  cache = {};
+  cacheReducerMap = {};
+}
+
+export function resetContext() {
+  context.state = {};
+  context.dispatch = [];
+}
+
+export function reset() {
+  resetCache();
+  resetContext();
+  selectors = {};
+  counter = 0;
 }
