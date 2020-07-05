@@ -4,7 +4,7 @@ import AddTodo from "./components/AddTodo";
 import TodoList from "./components/TodoList";
 import VisibilityFilters from "./components/VisibilityFilters";
 import { VISIBILITY_FILTERS } from "./constants";
-import { ADD_TODO, TOGGLE_TODO, SET_FILTER } from "./actionTypes";
+import { ADD_TODO, TOGGLE_TODO, SET_FILTER } from "./actions";
 import "./styles.css";
 
 const initialState = {

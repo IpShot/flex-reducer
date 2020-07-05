@@ -1,7 +1,12 @@
 import { dispatch } from './flex-reducer';
-import { ADD_TODO, TOGGLE_TODO, SET_FILTER } from "./actionTypes";
+import { unique } from './flex-reducer/utils';
 
 let nextTodoId = 0;
+
+export const ADD_TODO = unique('ADD_TODO');
+export const TOGGLE_TODO = unique('TOGGLE_TODO');
+export const SET_FILTER = unique('SET_FILTER');
+
 
 export const addTodo = (content) => dispatch({
   type: ADD_TODO,
