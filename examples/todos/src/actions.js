@@ -1,5 +1,5 @@
 import { dispatch } from './flex-reducer';
-import { unique } from './flex-reducer/utils';
+import { uniqueType as unique } from './flex-reducer/utils';
 
 let nextTodoId = 0;
 
