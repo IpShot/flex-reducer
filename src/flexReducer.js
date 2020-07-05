@@ -37,9 +37,8 @@ export function dispatch(action = {}) {
 }
 
 export function useFlexReducer(reducer, initialState, init, options = { cache: true }) {
-  if (!reducer || !initialState) {
-    throw new Error('Reducer and initialState arguments are required.');
-  }
+  if (!reducer) throw new Error('reducer argument(1) is required.');
+  if (!initialState) throw new Error('initialState argument(2) is required.');
 
   const initFunc = init || defaultInit;
   const initState = initFunc(initialState);
