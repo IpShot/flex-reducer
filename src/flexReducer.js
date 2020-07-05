@@ -106,7 +106,7 @@ export function useSelector(selector) {
 
 //----------------------------------
 //   DANGEROUS ZONE!!!
-//   SUPPOSE TO USE FOR TESTING ONLY
+//   FOR TESTING PURPOSE ONLY
 //----------------------------------
 
 export function getCache() {
