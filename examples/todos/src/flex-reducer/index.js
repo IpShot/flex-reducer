@@ -3,9 +3,9 @@ import shallowEqual from './shallowEqual';
 
 let counter = 0;
 const genKey = () => counter++;
-const cache = {};
-const cacheReducerMap = {};
-const selectors = {};
+let cache = {};
+let cacheReducerMap = {};
+let selectors = {};
 const context = {
   state: {},
   dispatch: [],
@@ -57,9 +57,12 @@ export function useFlexReducer(reducer, initialState, init, options = { cache: t
 
   const [state, disp] = useReducer(
     reducer,
-    options.cache && cache[cacheKey] || initialState,
+    options.cache && cache[cacheKey]?.current || initialState,
     initFunc
   );
+
+  const lastState = useRef();
+  lastState.current = state;
 
   useEffect(() => {
     if (!contextState) {
@@ -67,12 +70,12 @@ export function useFlexReducer(reducer, initialState, init, options = { cache: t
       context.dispatch.push(disp);
     }
     return () => {
-      if (options.cache && !cache[cacheKey]) cache[cacheKey] = state;
+      if (options.cache && !cache[cacheKey]) cache[cacheKey] = lastState;
       delete cacheReducerMap[cacheKey];
       delete context.state[cacheKey];
       removeDispatch(disp);
     }
-  }, []);
+  }, [cacheKey]);
 
   context.state[cacheKey] = state;
   return [context.state, dispatch];
@@ -96,10 +99,15 @@ export function useSelector(selector) {
   useEffect(() => {
     selectors[key.current] = forceRender;
     return () => delete selectors[key.current];
-  }, [selectors, key.current, forceRender]);
+  }, [key.current]);
 
   return currResult;
 }
+
+//----------------------------------
+//   DANGEROUS ZONE!!!
+//   SUPPOSE TO USE FOR TESTING ONLY
+//----------------------------------
 
 export function getCache() {
   return cache;
@@ -111,4 +119,21 @@ export function getState() {
 
 export function getContext() {
   return context;
+}
+
+export function resetCache() {
+  cache = {};
+  cacheReducerMap = {};
+}
+
+export function resetContext() {
+  context.state = {};
+  context.dispatch = [];
+}
+
+export function reset() {
+  resetCache();
+  resetContext();
+  selectors = {};
+  counter = 0;
 }
