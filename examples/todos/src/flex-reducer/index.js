@@ -14,7 +14,14 @@ const context = {
 Object.seal(context);
 
 function runSelectors() {
-  Object.keys(selectors).forEach(key => selectors[key]());
+  Object.keys(selectors).forEach(key => {
+    const { selector, forceRender, prevResult } = selectors[key];
+    const currResult = selector(context.state);
+    if (!shallowEqual(prevResult.current, currResult)) {
+      prevResult.current = currResult;
+      forceRender();
+    }
+  });
 }
 
 function defaultInit(initialState) {
@@ -37,22 +44,21 @@ export function dispatch(action = {}) {
 }
 
 export function useFlexReducer(reducer, initialState, init, options = { cache: true }) {
-  if (!reducer || !initialState) {
-    throw new Error('Reducer and initialState arguments are required.');
-  }
+  if (!reducer) throw new Error('reducer argument(1) is required.');
+  if (!initialState) throw new Error('initialState argument(2) is required.');
 
   const initFunc = init || defaultInit;
   const initState = initFunc(initialState);
 
   if (!initState.__reducer__) {
-    throw new Error('You have to specify initialState.__reducer__ name field.');
+    throw new Error('You have to specify a reducer name.');
   }
 
   const cacheKey = initState.__reducer__;
   const contextState = context.state[cacheKey];
 
   if (contextState && cacheReducerMap[cacheKey] !== reducer) {
-    throw new Error('initialState.__reducer__ name should be unique.');
+    throw new Error(`Component with "${cacheKey}" reducer name already rendered.`);
   }
 
   const [state, disp] = useReducer(
@@ -85,19 +91,14 @@ export function useSelector(selector) {
   if (typeof selector !== 'function') {
     throw new Error('Selector must be a function.');
   }
+
   const key = useRef(genKey());
   const [_, forceRender] = useReducer(s => s + 1, 0);
-  const selectorRef = useRef(selector);
-  const prevResult = useRef(selectorRef.current(context.state));
   const currResult = selector(context.state);
-
-  if (!shallowEqual(prevResult.current, currResult)) {
-    selectorRef.current = selector;
-    prevResult.current = currResult;
-  }
+  const prevResult = useRef(currResult);
 
   useEffect(() => {
-    selectors[key.current] = forceRender;
+    selectors[key.current] = { selector, forceRender, prevResult };
     return () => delete selectors[key.current];
   }, [key.current]);
 
@@ -106,7 +107,7 @@ export function useSelector(selector) {
 
 //----------------------------------
 //   DANGEROUS ZONE!!!
-//   SUPPOSE TO USE FOR TESTING ONLY
+//   FOR TESTING PURPOSE ONLY
 //----------------------------------
 
 export function getCache() {

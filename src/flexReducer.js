@@ -14,7 +14,14 @@ const context = {
 Object.seal(context);
 
 function runSelectors() {
-  Object.keys(selectors).forEach(key => selectors[key]());
+  Object.keys(selectors).forEach(key => {
+    const { selector, forceRender, prevResult } = selectors[key];
+    const currResult = selector(context.state);
+    if (!shallowEqual(prevResult.current, currResult)) {
+      prevResult.current = currResult;
+      forceRender();
+    }
+  });
 }
 
 function defaultInit(initialState) {
@@ -84,19 +91,14 @@ export function useSelector(selector) {
   if (typeof selector !== 'function') {
     throw new Error('Selector must be a function.');
   }
+
   const key = useRef(genKey());
   const [_, forceRender] = useReducer(s => s + 1, 0);
-  const selectorRef = useRef(selector);
-  const prevResult = useRef(selectorRef.current(context.state));
   const currResult = selector(context.state);
-
-  if (!shallowEqual(prevResult.current, currResult)) {
-    selectorRef.current = selector;
-    prevResult.current = currResult;
-  }
+  const prevResult = useRef(currResult);
 
   useEffect(() => {
-    selectors[key.current] = forceRender;
+    selectors[key.current] = { selector, forceRender, prevResult };
     return () => delete selectors[key.current];
   }, [key.current]);
 
