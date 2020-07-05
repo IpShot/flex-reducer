@@ -1,6 +1,6 @@
 import React from "react";
 import cx from "classnames";
-import { useSelector, dispatch } from "../flex-reducer";
+import { useSelector } from "../flex-reducer";
 import { setFilter } from "../actions";
 import { VISIBILITY_FILTERS } from "../constants";
 
@@ -17,7 +17,7 @@ const VisibilityFilters = () => {
               "filter",
               currentFilter === filter && "filter--active"
             )}
-            onClick={() => dispatch(setFilter(currentFilter))}
+            onClick={() => setFilter(currentFilter)}
           >
             {currentFilter}
           </span>

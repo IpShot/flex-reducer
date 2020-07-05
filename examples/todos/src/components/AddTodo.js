@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { dispatch } from "../flex-reducer";
 import { addTodo } from "../actions";
 
 const AddTodo = () => {
@@ -7,7 +6,7 @@ const AddTodo = () => {
 
   function handleAddTodo() {
     if (input) {
-      dispatch(addTodo(input));
+      addTodo(input);
       setInput('');
     }
   }

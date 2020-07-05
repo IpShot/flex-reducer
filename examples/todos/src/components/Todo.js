@@ -1,11 +1,10 @@
 import React from "react";
 import { toggleTodo } from '../actions';
-import { dispatch } from '../flex-reducer';
 import cx from "classnames";
 
 const Todo = React.memo(({ todo }) => {
   return (
-    <li className="todo-item" onClick={() => dispatch(toggleTodo(todo.id))}>
+    <li className="todo-item" onClick={() => toggleTodo(todo.id)}>
       {todo && todo.completed ? "👌" : "👋"}{" "}
       <span
         className={cx(
