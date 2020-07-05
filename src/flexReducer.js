@@ -44,14 +44,14 @@ export function useFlexReducer(reducer, initialState, init, options = { cache: t
   const initState = initFunc(initialState);
 
   if (!initState.__reducer__) {
-    throw new Error('You have to specify initialState.__reducer__ name field.');
+    throw new Error('You have to specify a reducer name.');
   }
 
   const cacheKey = initState.__reducer__;
   const contextState = context.state[cacheKey];
 
   if (contextState && cacheReducerMap[cacheKey] !== reducer) {
-    throw new Error('initialState.__reducer__ name should be unique.');
+    throw new Error(`Component with "${cacheKey}" reducer name already exists.`);
   }
 
   const [state, disp] = useReducer(
