@@ -51,7 +51,7 @@ export function useFlexReducer(reducer, initialState, init, options = { cache: t
   const contextState = context.state[cacheKey];
 
   if (contextState && cacheReducerMap[cacheKey] !== reducer) {
-    throw new Error(`Component with "${cacheKey}" reducer name already exists.`);
+    throw new Error(`Component with "${cacheKey}" reducer name already rendered.`);
   }
 
   const [state, disp] = useReducer(
