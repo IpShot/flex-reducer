@@ -85,7 +85,11 @@ export function useFlexReducer(reducerName, reducer, initialState, options = { c
       delete context.state[reducerName];
       delete context.dispatch[key.current];
     }
-  }, [reducer, render, reducerName, key.current]);
+  }, [
+    reducer, render, reducerName, cache,
+    lastState, options.cache, key.current,
+    context.state, context.dispatch,
+  ]);
 
   context.state[reducerName] = state;
   return [context.state, dispatch];
@@ -107,7 +111,7 @@ export function useSelector(selector) {
   useFlexEffect(() => {
     context.dispatch[key.current] = { selector, result, render };
     return () => delete context.dispatch[key.current];
-  }, [key.current, result]);
+  }, [selector, render, result, key.current, context.dispatch]);
 
   return state;
 }
