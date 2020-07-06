@@ -230,9 +230,9 @@ describe('Flex Reducer', () => {
       rtl.act(() => {
         pAction('Bye Parent!')
       })
-      expect(pRenders).toBe(2)
-      expect(cRenders).toBe(2)
-      expect(scRenders).toBe(2)
+      expect(pRenders).toBe(3)
+      expect(cRenders).toBe(3)
+      expect(scRenders).toBe(3)
     })
     it('should call a render on dispatch an action belong to it whether component memoized or not', () => {
       expect(cRenders).toBe(0)
@@ -268,7 +268,7 @@ describe('Flex Reducer', () => {
       rtl.act(() => {
         cAction('First Child!')
       })
-      expect(renders).toEqual(['Child', 'SubChild'])
+      expect(renders).toEqual(['Parent','Child', 'SubChild'])
     })
     it('should run dispatches in order from ancestor to descendant on dispatch after unmount and mount of child', () => {
       const { rerender } = rtl.render(<Parent />)
@@ -418,7 +418,7 @@ describe('Flex Reducer', () => {
       rtl.act(() => {
         cAction('Bye Child!')
       })
-      expect(pRenders).toBe(1)
+      expect(pRenders).toBe(2)
       expect(cRenders).toBe(2)
       expect(scRenders).toBe(1)
     })
@@ -450,51 +450,33 @@ describe('Flex Reducer', () => {
       expect(pRenders).toBe(2)
       expect(renders).toEqual(['Hello Parent!', 'Bye Parent!'])
     })
-    it('should call render on async dispatch (click event)', () => {
-      Parent = () => {
-        [state] = useFlexReducer('parent', pReducer, pInitialState)
+    it('should call render on action call (click event)', () => {
+      Child = () => {
+        [cState] = useFlexReducer('child', cReducer, cInitialState)
+        cRenders += 1
         function handleClick() {
-          rtl.act(() => {
-            pAction('Bye Parent!')
-          })
+          cAction('Bye Child!')
         }
-        pRenders += 1
-        renders.push(state.parent.value)
-        return <button onClick={handleClick}>Button</button>
+        return (
+          <div>
+            <button onClick={handleClick}>Button</button>
+            <SubChild />
+          </div>
+        )
       }
       rtl.render(<Parent />)
       expect(pRenders).toBe(1)
-      expect(renders).toEqual(['Hello Parent!'])
+      expect(cRenders).toBe(1)
+      expect(scRenders).toBe(1)
       rtl.fireEvent.click(rtl.screen.getByText('Button'))
       expect(pRenders).toBe(2)
-      expect(renders).toEqual(['Hello Parent!', 'Bye Parent!'])
+      expect(cRenders).toBe(2)
+      expect(scRenders).toBe(2)
       rtl.fireEvent.click(rtl.screen.getByText('Button'))
       rtl.fireEvent.click(rtl.screen.getByText('Button'))
-      expect(pRenders).toBe(2)
-      expect(renders).toEqual(['Hello Parent!', 'Bye Parent!'])
-    })
-    it('should not call render on async dispatch if payload didn\'t change', () => {
-      Parent = () => {
-        [state] = useFlexReducer('parent', pReducer, pInitialState)
-        function handleClick() {
-          rtl.act(() => {
-            pAction('Hello Parent!')
-          })
-        }
-        pRenders += 1
-        renders.push(state.parent.value)
-        return <button onClick={handleClick}>Button</button>
-      }
-      rtl.render(<Parent />)
-      expect(pRenders).toBe(1)
-      expect(renders).toEqual(['Hello Parent!'])
-      rtl.fireEvent.click(rtl.screen.getByText('Button'))
-      expect(pRenders).toBe(1)
-      expect(renders).toEqual(['Hello Parent!'])
-      rtl.fireEvent.click(rtl.screen.getByText('Button'))
-      rtl.fireEvent.click(rtl.screen.getByText('Button'))
-      expect(pRenders).toBe(1)
-      expect(renders).toEqual(['Hello Parent!'])
+      expect(pRenders).toBe(4)
+      expect(cRenders).toBe(4)
+      expect(scRenders).toBe(4)
     })
   })
   describe('getState', () => {
