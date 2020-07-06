@@ -510,9 +510,9 @@ describe('Flex Reducer', () => {
       Child = ({ parentValue }) => {
         [cState] = useFlexReducer('child', cReducer, cInitialState)
         cRenders += 1
-        renders.push(parentValue)
         return (
           <div>
+            {parentValue}
             <SubChild />
           </div>
         )
@@ -520,9 +520,10 @@ describe('Flex Reducer', () => {
       Parent = () => {
         [state] = useFlexReducer('parent', pReducer, pInitialState)
         pRenders += 1
+        renders.push(state.parent.value)
         return (
           <div>
-            <Child parentValue={state.parent.value}/>
+            <Child parentValue={[...renders]}/>
           </div>
         )
       }
