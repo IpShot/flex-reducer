@@ -8,10 +8,3 @@ export function uniqueType(type, count = 0) {
   types.push(typ);
   return typ;
 }
-
-export function reducerName(name) {
-  return (initialState) => {
-    initialState.__reducer__ = name;
-    return initialState;
-  }
-}
