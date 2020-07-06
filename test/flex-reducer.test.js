@@ -500,4 +500,51 @@ describe('Flex Reducer', () => {
       }).toThrow('The \'UPDATE_PARENT\' action type already exists.')
     })
   })
+  describe('check if it works well with props', () => {
+    it('should call one render on dispatch and props change happened together', () => {
+      SubChild = memo(() => {
+        scState = useSelector(s => s.parent.value)
+        scRenders += 1
+        return <span />
+      })
+      Child = ({ parentValue }) => {
+        [cState] = useFlexReducer('child', cReducer, cInitialState)
+        cRenders += 1
+        renders.push(parentValue)
+        return (
+          <div>
+            <SubChild />
+          </div>
+        )
+      }
+      Parent = () => {
+        [state] = useFlexReducer('parent', pReducer, pInitialState)
+        pRenders += 1
+        return (
+          <div>
+            <Child parentValue={state.parent.value}/>
+          </div>
+        )
+      }
+      rtl.render(<Parent />)
+      expect(pRenders).toBe(1)
+      expect(cRenders).toBe(1)
+      expect(scRenders).toBe(1)
+      expect(renders).toEqual(['Hello Parent!'])
+      rtl.act(() => {
+        cAction('Bye Child!')
+      })
+      expect(pRenders).toBe(2)
+      expect(cRenders).toBe(2)
+      expect(scRenders).toBe(1)
+      expect(renders).toEqual(['Hello Parent!', 'Hello Parent!'])
+      rtl.act(() => {
+        pAction('Bye Parent!')
+      })
+      expect(pRenders).toBe(3)
+      expect(cRenders).toBe(3)
+      expect(scRenders).toBe(2)
+      expect(renders).toEqual(['Hello Parent!', 'Hello Parent!', 'Bye Parent!'])
+    })
+  })
 })
