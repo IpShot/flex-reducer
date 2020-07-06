@@ -69,8 +69,6 @@ export function useFlexReducer(reducerName, reducer, initialState, options = { c
     options.cache && cache[reducerName]?.current || initialState,
   );
 
-  // console.log(`${reducerName}: `, state)
-
   const lastState = useRef();
   lastState.current = state;
 
