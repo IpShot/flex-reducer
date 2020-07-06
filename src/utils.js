@@ -1,10 +1,9 @@
 const types = [];
 
-export function uniqueType(type, count = 0) {
-  const typ = count === 0 ? type : `${type}-${count}`;
-  if (types.findIndex(t => t === typ) !== -1) {
-    return unique(type, count + 1);
+export function uniqueType(type) {
+  if (types.findIndex(t => t === type) !== -1) {
+    throw new Error(`The '${type}' action type already exists.`);
   }
-  types.push(typ);
-  return typ;
+  types.push(type);
+  return type;
 }
