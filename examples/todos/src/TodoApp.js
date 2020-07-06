@@ -1,6 +1,5 @@
 import React from "react";
 import { useFlexReducer } from './flex-reducer';
-import { reducerName } from './flex-reducer/utils';
 import AddTodo from "./components/AddTodo";
 import TodoList from "./components/TodoList";
 import VisibilityFilters from "./components/VisibilityFilters";
@@ -53,7 +52,7 @@ const reducer = function(state, action) {
 }
 
 export default function TodoApp() {
-  const [state, dispatch] = useFlexReducer(reducer, initialState, reducerName('app'));
+  const [state, dispatch] = useFlexReducer('app', reducer, initialState);
   return (
     <div className="todo-app">
       <h1>Todo List ({Object.keys(state.app.todos).length})</h1>

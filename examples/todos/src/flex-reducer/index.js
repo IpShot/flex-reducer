@@ -1,37 +1,45 @@
-import { useReducer, useRef, useEffect } from 'react';
+import { useReducer, useRef, useEffect, useLayoutEffect } from 'react';
 import shallowEqual from './shallowEqual';
 
 let counter = 0;
 const genKey = () => counter++;
 let cache = {};
-let cacheReducerMap = {};
-let selectors = {};
 const context = {
   state: {},
-  dispatch: [],
+  dispatch: {},
 };
 
 Object.seal(context);
 
-function runSelectors() {
-  Object.keys(selectors).forEach(key => {
-    const { selector, forceRender, prevResult } = selectors[key];
-    const currResult = selector(context.state);
-    if (!shallowEqual(prevResult.current, currResult)) {
-      prevResult.current = currResult;
-      forceRender();
-    }
-  });
+// We use useEffect for server side rendering
+const useFlexEffect = typeof window !== 'undefined'
+  ? useLayoutEffect
+  : useEffect;
+
+function callSelectorDispatch(dispatch) {
+  const { selector, result, render } = dispatch;
+  const nextResult = selector(context.state);
+  if (!shallowEqual(result.current, nextResult)) {
+    result.current = nextResult;
+    render(nextResult);
+  }
 }
 
-function defaultInit(initialState) {
-  return initialState;
+function callReducerDispatch(dispatch, action) {
+  const { reducerName, reducer, render } = dispatch;
+  const currState = context.state[reducerName];
+  const nextState = reducer(currState, action);
+  if (!shallowEqual(currState, nextState)) {
+    context.state[reducerName] = nextState;
+    render(nextState);
+  }
 }
 
-function removeDispatch(dispatch) {
-  const idx = context.dispatch.findIndex(d => d === dispatch);
-  if (idx !== -1) {
-    context.dispatch.splice(idx, 1);
+function callDispatch(dispatch, action) {
+  if (dispatch.reducerName) {
+    callReducerDispatch(dispatch, action)
+  } else {
+    callSelectorDispatch(dispatch);
   }
 }
 
@@ -39,51 +47,49 @@ export function dispatch(action = {}) {
   if (!action.type || typeof action.type !== 'string' || !action.payload) {
     throw new Error('Wrong action format.');
   }
-  context.dispatch.forEach(disp => disp(action));
-  runSelectors();
+  Object.keys(context.dispatch).forEach(key =>
+    callDispatch(context.dispatch[key], action)
+  );
 }
 
-export function useFlexReducer(reducer, initialState, init, options = { cache: true }) {
-  if (!reducer) throw new Error('reducer argument(1) is required.');
-  if (!initialState) throw new Error('initialState argument(2) is required.');
+export function useFlexReducer(reducerName, reducer, initialState, options = { cache: true }) {
+  if (!reducerName) throw new Error('reducer name argument(1) is required.');
+  if (!reducer) throw new Error('reducer argument(2) is required.');
+  if (!initialState) throw new Error('initialState argument(3) is required.');
 
-  const initFunc = init || defaultInit;
-  const initState = initFunc(initialState);
+  const key = useRef(genKey());
+  const contextState = context.state[reducerName];
 
-  if (!initState.__reducer__) {
-    throw new Error('You have to specify a reducer name.');
+  if (contextState && context.dispatch[key.current]?.reducer !== reducer) {
+    throw new Error(`Component with "${reducerName}" reducer name already in use.`);
   }
 
-  const cacheKey = initState.__reducer__;
-  const contextState = context.state[cacheKey];
-
-  if (contextState && cacheReducerMap[cacheKey] !== reducer) {
-    throw new Error(`Component with "${cacheKey}" reducer name already rendered.`);
-  }
-
-  const [state, disp] = useReducer(
-    reducer,
-    options.cache && cache[cacheKey]?.current || initialState,
-    initFunc
+  const [state, render] = useReducer(
+    (currState, nextState) => nextState || currState,
+    options.cache && cache[reducerName]?.current || initialState,
   );
+
+  // console.log(`${reducerName}: `, state)
 
   const lastState = useRef();
   lastState.current = state;
 
-  useEffect(() => {
+  useFlexEffect(() => {
     if (!contextState) {
-      cacheReducerMap[cacheKey] = reducer;
-      context.dispatch.push(disp);
+      context.dispatch[key.current] = {
+        reducerName,
+        reducer,
+        render,
+      }
     }
     return () => {
-      if (options.cache && !cache[cacheKey]) cache[cacheKey] = lastState;
-      delete cacheReducerMap[cacheKey];
-      delete context.state[cacheKey];
-      removeDispatch(disp);
+      if (options.cache && !cache[reducerName]) cache[reducerName] = lastState;
+      delete context.state[reducerName];
+      delete context.dispatch[key.current];
     }
-  }, [cacheKey]);
+  }, [reducer, render, reducerName, key.current]);
 
-  context.state[cacheKey] = state;
+  context.state[reducerName] = state;
   return [context.state, dispatch];
 }
 
@@ -93,16 +99,19 @@ export function useSelector(selector) {
   }
 
   const key = useRef(genKey());
-  const [_, forceRender] = useReducer(s => s + 1, 0);
-  const currResult = selector(context.state);
-  const prevResult = useRef(currResult);
+  const [state, render] = useReducer(
+    (currState, nextState) => nextState || currState,
+    selector(context.state)
+  );
+  const result = useRef();
+  result.current = state;
 
-  useEffect(() => {
-    selectors[key.current] = { selector, forceRender, prevResult };
-    return () => delete selectors[key.current];
-  }, [key.current]);
+  useFlexEffect(() => {
+    context.dispatch[key.current] = { selector, result, render };
+    return () => delete context.dispatch[key.current];
+  }, [key.current, result]);
 
-  return currResult;
+  return state;
 }
 
 //----------------------------------
@@ -110,31 +119,13 @@ export function useSelector(selector) {
 //   FOR TESTING PURPOSE ONLY
 //----------------------------------
 
-export function getCache() {
-  return cache;
-}
-
 export function getState() {
   return context.state;
 }
 
-export function getContext() {
-  return context;
-}
-
-export function resetCache() {
-  cache = {};
-  cacheReducerMap = {};
-}
-
-export function resetContext() {
-  context.state = {};
-  context.dispatch = [];
-}
-
 export function reset() {
-  resetCache();
-  resetContext();
-  selectors = {};
   counter = 0;
+  cache = {};
+  context.state = {};
+  context.dispatch = {};
 }
