@@ -213,7 +213,7 @@ describe('Flex Reducer', () => {
       expect(cRenders).toBe(2)
       expect(scRenders).toBe(2)
     })
-    it('should not call a render on dispatch the same payload', () => {
+    it('should not call a render on dispatch if it doesn\'t change state ', () => {
       expect(pRenders).toBe(0)
       expect(cRenders).toBe(0)
       expect(scRenders).toBe(0)
@@ -230,9 +230,9 @@ describe('Flex Reducer', () => {
       rtl.act(() => {
         pAction('Bye Parent!')
       })
-      expect(pRenders).toBe(3)
-      expect(cRenders).toBe(3)
-      expect(scRenders).toBe(3)
+      expect(pRenders).toBe(2)
+      expect(cRenders).toBe(2)
+      expect(scRenders).toBe(2)
     })
     it('should call a render on dispatch an action belong to it whether component memoized or not', () => {
       expect(cRenders).toBe(0)
@@ -268,7 +268,7 @@ describe('Flex Reducer', () => {
       rtl.act(() => {
         cAction('First Child!')
       })
-      expect(renders).toEqual(['Parent','Child', 'SubChild'])
+      expect(renders).toEqual(['Child', 'SubChild'])
     })
     it('should run dispatches in order from ancestor to descendant on dispatch after unmount and mount of child', () => {
       const { rerender } = rtl.render(<Parent />)
@@ -418,7 +418,7 @@ describe('Flex Reducer', () => {
       rtl.act(() => {
         cAction('Bye Child!')
       })
-      expect(pRenders).toBe(2)
+      expect(pRenders).toBe(1)
       expect(cRenders).toBe(2)
       expect(scRenders).toBe(1)
     })
@@ -469,14 +469,14 @@ describe('Flex Reducer', () => {
       expect(cRenders).toBe(1)
       expect(scRenders).toBe(1)
       rtl.fireEvent.click(rtl.screen.getByText('Button'))
-      expect(pRenders).toBe(2)
+      expect(pRenders).toBe(1)
       expect(cRenders).toBe(2)
       expect(scRenders).toBe(2)
       rtl.fireEvent.click(rtl.screen.getByText('Button'))
       rtl.fireEvent.click(rtl.screen.getByText('Button'))
-      expect(pRenders).toBe(4)
-      expect(cRenders).toBe(4)
-      expect(scRenders).toBe(4)
+      expect(pRenders).toBe(1)
+      expect(cRenders).toBe(2)
+      expect(scRenders).toBe(2)
     })
   })
   describe('getState', () => {
@@ -535,17 +535,17 @@ describe('Flex Reducer', () => {
       rtl.act(() => {
         cAction('Bye Child!')
       })
-      expect(pRenders).toBe(2)
+      expect(pRenders).toBe(1)
       expect(cRenders).toBe(2)
       expect(scRenders).toBe(1)
-      expect(renders).toEqual(['Hello Parent!', 'Hello Parent!'])
+      expect(renders).toEqual(['Hello Parent!'])
       rtl.act(() => {
         pAction('Bye Parent!')
       })
-      expect(pRenders).toBe(3)
+      expect(pRenders).toBe(2)
       expect(cRenders).toBe(3)
       expect(scRenders).toBe(2)
-      expect(renders).toEqual(['Hello Parent!', 'Hello Parent!', 'Bye Parent!'])
+      expect(renders).toEqual(['Hello Parent!', 'Bye Parent!'])
     })
   })
 })
