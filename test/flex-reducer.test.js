@@ -1,13 +1,13 @@
-import React, { memo, useEffect, useLayoutEffect, useReducer } from 'react';
+import React, { memo, useEffect, useLayoutEffect } from 'react';
 import { renderHook, act, cleanup } from '@testing-library/react-hooks';
 import * as rtl from '@testing-library/react';
-import shallowEqual from '../src/shallowEqual';
 import { reset } from '../src/flexReducer';
 import {
   useFlexReducer,
   useSelector,
   dispatch,
   uniqueType,
+  shallowEqual,
   getState,
 } from '../src';
 
