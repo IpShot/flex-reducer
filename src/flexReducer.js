@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useLayoutEffect } from 'react';
-import shallowEqual from './shallowEqual';
+import { unstable_batchedUpdates as batch } from './utils/batch';
+import shallowEqual from './utils/shallowEqual';
 
 let counter = 1;
 const genKey = () => counter++;
@@ -47,9 +48,11 @@ export function dispatch(action = {}) {
   if (!action.type || typeof action.type !== 'string') {
     throw new Error('Wrong action format.');
   }
-  Object.keys(context.dispatch).forEach(key =>
-    callDispatch(context.dispatch[key], action)
-  );
+  batch(() => {
+    Object.keys(context.dispatch).forEach(key =>
+      callDispatch(context.dispatch[key], action)
+    );
+  });
 }
 
 export function useFlexReducer(reducerName, reducer, initialState, options = { cache: true }) {

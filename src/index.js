@@ -1,6 +1,6 @@
 import { useFlexReducer, useSelector, dispatch, getState } from './flexReducer';
-import { uniqueType } from './utils';
-import shallowEqual from './shallowEqual';
+import uniqueType from './utils/uniqueType';
+import shallowEqual from './utils/shallowEqual';
 
 export {
   useFlexReducer,
