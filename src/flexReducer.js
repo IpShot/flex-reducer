@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import shallowEqual from './shallowEqual';
 
-let counter = 0;
+let counter = 1;
 const genKey = () => counter++;
 let cache = {};
 const context = {
@@ -27,9 +27,12 @@ function callSelectorDispatch(dispatch) {
 
 function callReducerDispatch(dispatch, action) {
   const { reducerName, reducer, render } = dispatch;
-  const nextState = { ...reducer(context.state[reducerName], action) };
-  context.state[reducerName] = nextState;
-  render(nextState);
+  const state = context.state[reducerName];
+  const nextState = reducer(state, action);
+  if (!shallowEqual(state, nextState)) {
+    context.state[reducerName] = nextState;
+    render(nextState);
+  }
 }
 
 function callDispatch(dispatch, action) {
@@ -54,17 +57,19 @@ export function useFlexReducer(reducerName, reducer, initialState, options = { c
   if (!reducer) throw new Error('reducer argument(2) is required.');
   if (!initialState) throw new Error('initialState argument(3) is required.');
 
-  const key = useRef(genKey());
+  const key = useRef();
+  if (!key.current) {
+    key.current = genKey();
+  }
   const contextState = context.state[reducerName];
-
   if (contextState && context.dispatch[key.current]?.reducer !== reducer) {
     throw new Error(`Component with "${reducerName}" reducer name already in use.`);
   }
 
   const [state, render] = useState(options.cache && cache[reducerName]?.current || initialState);
-
   const lastState = useRef();
   lastState.current = state;
+  context.state[reducerName] = state;
 
   useFlexEffect(() => {
     if (!contextState) {
@@ -85,7 +90,6 @@ export function useFlexReducer(reducerName, reducer, initialState, options = { c
     context.state, context.dispatch,
   ]);
 
-  context.state[reducerName] = state;
   return [context.state, dispatch];
 }
 
@@ -94,8 +98,15 @@ export function useSelector(selector) {
     throw new Error('Selector must be a function.');
   }
 
-  const key = useRef(genKey());
-  const [state, render] = useState(selector(context.state));
+  const key = useRef();
+  if (!key.current) {
+    key.current = genKey();
+  }
+  const initState = useRef();
+  if (!initState.current) {
+    initState.current = selector(context.state);
+  }
+  const [state, render] = useState(initState.current);
   const result = useRef();
   result.current = state;
 
@@ -117,7 +128,7 @@ export function getState() {
 }
 
 export function reset() {
-  counter = 0;
+  counter = 1;
   cache = {};
   context.state = {};
   context.dispatch = {};
