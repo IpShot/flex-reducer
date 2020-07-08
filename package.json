@@ -5,10 +5,11 @@
   "keywords": [
     "react",
     "reactjs",
+    "react-app",
     "react-hooks",
-    "store",
-    "data",
-    "manager"
+    "reducer",
+    "selector",
+    "data-management"
   ],
   "license": "MIT",
   "author": "Roman Zhernosek <roman@zhernosek.com>",
