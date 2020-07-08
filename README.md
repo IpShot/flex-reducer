@@ -32,20 +32,23 @@ ReactDOM.render(
   rootElement
 );
 
-// actions.js
-import { dispatch } from 'flex-reducer';
+// TodoApp.js
+import { useFlexReducer } from 'flex-reducer';
+import AddTodo from './AddTodo';
+import TodoList from './TodoList';
+import { setInput } from './actions';
 
-export const SET_INPUT = 'SET_INPUT';
-export const ADD_TODO = 'ADD_TODO';
-
-export const setInput = (value) => dispatch({
-  type: SET_INPUT,
-  payload: value
-});
-export const addTodo = (id, content) => dispatch({
-  type: ADD_TODO,
-  payload: { id, content }
-});
+export default function TodoApp() {
+  const [state] = useFlexReducer('app', reducer, initialState);
+  return (
+    <div className="todo-app">
+      <h1>{state.title}</h1>
+      <input value={state.input} onChange={e => setInput(e.target.value)} />
+      <AddTodo />
+      <TodoList />
+    </div>
+  );
+}
 
 // AddTodo.js
 import { useSelector } from 'flex-reducer';
@@ -66,26 +69,25 @@ export default const AddTodo = () => {
         Add Todo
       </button>
   );
-};
-
-// TodoApp.js
-import { useFlexReducer } from 'flex-reducer';
-import AddTodo from './AddTodo';
-import TodoList from './TodoList';
-import { setInput } from './actions';
-
-export default function TodoApp() {
-  const [state] = useFlexReducer('app', reducer, initialState);
-  return (
-    <div className="todo-app">
-      <h1>{state.title}</h1>
-      <input value={state.input} onChange={e => setInput(e.target.value)} />
-      <AddTodo />
-      <TodoList />
-    </div>
-  );
 }
+
+// actions.js
+import { dispatch } from 'flex-reducer';
+
+export const SET_INPUT = 'SET_INPUT';
+export const ADD_TODO = 'ADD_TODO';
+
+export const setInput = (value) => dispatch({
+  type: SET_INPUT,
+  payload: value
+});
+export const addTodo = (id, content) => dispatch({
+  type: ADD_TODO,
+  payload: { id, content }
+});
 ```
+
+ For more detailed example check [todos app](https://github.com/IpShot/flex-reducer/tree/master/examples/todos).
 
 ## License
 
