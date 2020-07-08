@@ -11,6 +11,18 @@ Flexible reducer for a React app data management. Use it in a component as a reg
 - You can use dispatch out of a component.
 - Small code base just about 130 lines you can figure out easily.
 
+## Installation
+
+Flex Reducer requires **React 16.8.3 or later**.
+
+```sh
+# If you use npm:
+npm install flex-reducer
+
+# Or if you use Yarn:
+yarn add flex-reducer
+```
+
 ## Usage
 ```js
 // useFlexReducer
