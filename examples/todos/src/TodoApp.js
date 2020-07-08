@@ -55,7 +55,7 @@ export default function TodoApp() {
   const [state, dispatch] = useFlexReducer('app', reducer, initialState);
   return (
     <div className="todo-app">
-      <h1>Todo List ({Object.keys(state.app.todos).length})</h1>
+      <h1>Todo List ({Object.keys(state.todos).length})</h1>
       <AddTodo />
       <TodoList />
       <VisibilityFilters />
