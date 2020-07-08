@@ -1,5 +1,5 @@
 import React from "react";
-import { useSelector } from "../flex-reducer";
+import { useSelector } from "flex-reducer";
 import Todo from "./Todo";
 import { VISIBILITY_FILTERS } from "../constants";
 

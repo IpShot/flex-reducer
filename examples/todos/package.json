@@ -1,14 +1,15 @@
 {
-  "name": "todoapp-with-hux",
+  "name": "todoapp-with-flex-reducer",
   "version": "1.0.0",
   "author": "Roman Zhernosek <roman@zhernosek.com>",
-  "description": "A todo list app using Hux.",
+  "description": "A todo list app using Flex Reducer.",
   "main": "src/index.js",
   "scripts": {
     "start": "react-scripts start"
   },
   "dependencies": {
     "classnames": "^2.2.6",
+    "flex-reducer": "^1.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "^3.4.1"

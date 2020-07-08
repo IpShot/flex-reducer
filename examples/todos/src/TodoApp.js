@@ -1,5 +1,5 @@
 import React from "react";
-import { useFlexReducer } from './flex-reducer';
+import { useFlexReducer } from 'flex-reducer';
 import AddTodo from "./components/AddTodo";
 import TodoList from "./components/TodoList";
 import VisibilityFilters from "./components/VisibilityFilters";
