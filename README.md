@@ -11,7 +11,7 @@ Flexible reducer for a React app data management. Use it in a component as a reg
 - You can use dispatch out of a component.
 - Small code base just about 120 lines you can figure out easily.
 
-## Interface
+## Usage
 ```js
 // useFlexReducer
 const [state, dispatch] = useFlexReducer('app', reducer, initialState);
@@ -21,7 +21,7 @@ const todos = state.todos;
 const todos = useSelector(state => state.app.todos, equalityFn?)
 ```
 
-## How to use
+## Example
 ```js
 // index.js
 import TodoApp from "./TodoApp";
@@ -86,3 +86,7 @@ export default function TodoApp() {
   );
 }
 ```
+
+## License
+
+[MIT](LICENSE.md)
