@@ -12,7 +12,7 @@ Flexible reducer for a React app data management. Use it in a component as a reg
 - Small code base just about 120 lines you can figure out easily.
 
 ## Interface
-```
+```js
 // useFlexReducer
 const [state, dispatch] = useFlexReducer('app', reducer, initialState);
 const todos = state.todos;
@@ -22,7 +22,7 @@ const todos = useSelector(state => state.app.todos, equalityFn?)
 ```
 
 ## How to use
-``` 
+```js
 // index.js
 import TodoApp from "./TodoApp";
 
