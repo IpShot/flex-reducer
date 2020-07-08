@@ -93,7 +93,7 @@ export function useFlexReducer(reducerName, reducer, initialState, options = { c
     context.state, context.dispatch,
   ]);
 
-  return [context.state, dispatch];
+  return [state, dispatch];
 }
 
 function refEquality(prev, next) {

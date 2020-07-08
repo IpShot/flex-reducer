@@ -107,14 +107,14 @@ describe('Flex Reducer', () => {
   describe('dispatch', () => {
     it('should dispatch an action', () => {
       rtl.render(<Parent />)
-      expect(state.parent.value).toBe(pInitialState.value)
+      expect(state.value).toBe(pInitialState.value)
       rtl.act(() => {
         dispatch({
           type: 'UPDATE_PARENT',
           payload: 'Updated Parent'
         })
       })
-      expect(state.parent.value).toBe('Updated Parent')
+      expect(state.value).toBe('Updated Parent')
     })
   })
   describe('useFlexReducer', () => {
@@ -122,7 +122,7 @@ describe('Flex Reducer', () => {
       const { result } = renderHook(
         () => useFlexReducer('parent', pReducer, pInitialState)
       )
-      expect(result.current[0].parent).toEqual(pInitialState)
+      expect(result.current[0]).toEqual(pInitialState)
     })
     it('should return dispatch', () => {
       const { result } = renderHook(
@@ -134,49 +134,45 @@ describe('Flex Reducer', () => {
       const { result } = renderHook(
         () => useFlexReducer('parent', pReducer, pInitialState)
       )
-      expect(result.current[0].parent.value).toBe('Hello Parent!')
+      expect(result.current[0].value).toBe('Hello Parent!')
       act(() => {
         pAction('Bye Parent!')
       })
-      expect(result.current[0].parent.value).toBe('Bye Parent!')
+      expect(result.current[0].value).toBe('Bye Parent!')
     })
     it('should return the latest state on rerender', () => {
       const { result, rerender } = renderHook(
         () => useFlexReducer('parent', pReducer, pInitialState)
       )
-      expect(result.current[0].parent.value).toBe('Hello Parent!')
+      expect(result.current[0].value).toBe('Hello Parent!')
       act(() => {
         pAction('Bye Parent!')
       })
-      expect(result.current[0].parent.value).toBe('Bye Parent!')
+      expect(result.current[0].value).toBe('Bye Parent!')
       rerender()
-      expect(result.current[0].parent.value).toBe('Bye Parent!')
+      expect(result.current[0].value).toBe('Bye Parent!')
     })
     it('should return the latest state on multiple dispatches of the same reducer', () => {
       const { result } = renderHook(
         () => useFlexReducer('parent', pReducer, pInitialState)
       )
-      expect(result.current[0].parent.value).toBe('Hello Parent!')
+      expect(result.current[0].value).toBe('Hello Parent!')
       act(() => {
         pAction('Bye Parent!')
         pAction('Last Parent!')
       })
-      expect(result.current[0].parent.value).toBe('Last Parent!')
+      expect(result.current[0].value).toBe('Last Parent!')
     })
     it('should return the latest state on multiple dispatches of different reducers', () => {
       rtl.render(<Parent />)
-      expect(state.parent.value).toBe('Hello Parent!')
-      expect(cState.parent.value).toBe('Hello Parent!')
-      expect(state.child.value).toBe('Hello Child!')
-      expect(cState.child.value).toBe('Hello Child!')
+      expect(state.value).toBe('Hello Parent!')
+      expect(cState.value).toBe('Hello Child!')
       rtl.act(() => {
         pAction('Last Parent!')
         cAction('Last Child!')
       })
-      expect(state.parent.value).toBe('Last Parent!')
-      expect(cState.parent.value).toBe('Last Parent!')
-      expect(state.child.value).toBe('Last Child!')
-      expect(cState.child.value).toBe('Last Child!')
+      expect(state.value).toBe('Last Parent!')
+      expect(cState.value).toBe('Last Child!')
     })
     it('should return the latest state on any async dispatch', async () => {
       Parent = () => {
@@ -185,16 +181,16 @@ describe('Flex Reducer', () => {
         return <button onClick={() => pAction('Bye Parent!')}>Button</button>
       }
       rtl.render(<Parent />)
-      expect(state.parent.value).toEqual('Hello Parent!')
+      expect(state.value).toEqual('Hello Parent!')
       rtl.fireEvent.click(rtl.screen.getByText('Button'))
-      expect(state.parent.value).toEqual('Bye Parent!')
+      expect(state.value).toEqual('Bye Parent!')
       await new Promise((resolve) => {
         rtl.act(() => {
           pAction('Last Parent!')
         })
         resolve()
       })
-      expect(state.parent.value).toEqual('Last Parent!')
+      expect(state.value).toEqual('Last Parent!')
     })
     it('should call one render on multiple dispatches at time', () => {
       rtl.render(<Parent />)
@@ -298,7 +294,7 @@ describe('Flex Reducer', () => {
           pAction('Bye Parent!')
         }, [])
         pRenders += 1
-        renders.push(state.parent.value)
+        renders.push(state.value)
         return <span />
       }
       rtl.render(<Parent />)
@@ -312,7 +308,7 @@ describe('Flex Reducer', () => {
           pAction('Bye Parent!')
         }, [])
         pRenders += 1
-        renders.push(state.parent.value)
+        renders.push(state.value)
         return <span />
       }
       rtl.render(<Parent />)
@@ -349,17 +345,13 @@ describe('Flex Reducer', () => {
     })
     it('should return cached state if component unmounted and mounted again', () => {
       const { unmount } = rtl.render(<Parent />)
-      expect(state.parent.value).toBe('Hello Parent!')
-      expect(state.child.value).toBe('Hello Child!')
-      expect(cState.parent.value).toBe('Hello Parent!')
-      expect(cState.child.value).toBe('Hello Child!')
+      expect(state.value).toBe('Hello Parent!')
+      expect(cState.value).toBe('Hello Child!')
       rtl.act(() => {
         pAction('Bye Parent!')
       })
-      expect(state.parent.value).toBe('Bye Parent!')
-      expect(state.child.value).toBe('Hello Child!')
-      expect(cState.parent.value).toBe('Bye Parent!')
-      expect(cState.child.value).toBe('Hello Child!')
+      expect(state.value).toBe('Bye Parent!')
+      expect(cState.value).toBe('Hello Child!')
 
       const oldState = { ...state }
       const oldCState = { ...cState }
@@ -367,10 +359,8 @@ describe('Flex Reducer', () => {
       rtl.render(<Parent />)
       expect(oldState).toEqual(state)
       expect(oldCState).toEqual(cState)
-      expect(oldState.parent.value).toBe('Bye Parent!')
-      expect(oldState.child.value).toBe('Hello Child!')
-      expect(oldCState.parent.value).toBe('Bye Parent!')
-      expect(oldCState.child.value).toBe('Hello Child!')
+      expect(oldState.value).toBe('Bye Parent!')
+      expect(oldCState.value).toBe('Hello Child!')
     })
     it('should return initial state if component unmounted and mounted again and cache option set to false', () => {
       Parent = () => {
@@ -382,30 +372,22 @@ describe('Flex Reducer', () => {
         )
       }
       const { unmount } = rtl.render(<Parent />)
-      expect(state.parent.value).toBe('Hello Parent!')
-      expect(cState.parent.value).toBe('Hello Parent!')
-      expect(state.child.value).toBe('Hello Child!')
-      expect(cState.child.value).toBe('Hello Child!')
+      expect(state.value).toBe('Hello Parent!')
+      expect(cState.value).toBe('Hello Child!')
       rtl.act(() => {
         pAction('Bye Parent!')
         cAction('Bye Child!')
       })
-      expect(state.parent.value).toBe('Bye Parent!')
-      expect(cState.parent.value).toBe('Bye Parent!')
-      expect(state.child.value).toBe('Bye Child!')
-      expect(cState.child.value).toBe('Bye Child!')
+      expect(state.value).toBe('Bye Parent!')
+      expect(cState.value).toBe('Bye Child!')
       const oldState = { ...state }
       const oldCState = { ...cState }
       unmount()
       rtl.render(<Parent />)
-      expect(state.parent).toEqual(pInitialState)
-      expect(cState.parent).toEqual(pInitialState)
-      expect(state.child).not.toEqual(cInitialState)
-      expect(cState.child).not.toEqual(cInitialState)
-      expect(state.parent.value).toBe('Hello Parent!')
-      expect(cState.parent.value).toBe('Hello Parent!')
-      expect(state.child.value).toBe('Bye Child!')
-      expect(cState.child.value).toBe('Bye Child!')
+      expect(state).toEqual(pInitialState)
+      expect(cState).not.toEqual(cInitialState)
+      expect(state.value).toBe('Hello Parent!')
+      expect(cState.value).toBe('Bye Child!')
     })
     it('should throw an error if reducer name is missing', () => {
       const { result } = renderHook(
@@ -491,19 +473,25 @@ describe('Flex Reducer', () => {
       const { result } = renderHook(
         () => useFlexReducer('parent', pReducer, pInitialState)
       )
-      expect(getState()).toEqual(result.current[0])
+      expect(getState()).toEqual({ parent: result.current[0] })
       act(() => {
         pAction('Bye Parent!')
       })
-      expect(getState()).toEqual(result.current[0])
+      expect(getState()).toEqual({ parent: result.current[0] })
     })
   })
   describe('uniqueType', () => {
-    it('should throw an error if type is duplicating', () => {
+    it('should throw an error if types are duplicating', () => {
       expect(() => {
         uniqueType('UPDATE_PARENT')
         uniqueType('UPDATE_PARENT')
       }).toThrow('The \'UPDATE_PARENT\' action type already exists.')
+    })
+    it('should not throw an error if types are different', () => {
+      expect(() => {
+        uniqueType('PARENT')
+        uniqueType('CHILD')
+      }).not.toThrow()
     })
   })
   describe('check if it works well with props', () => {
@@ -526,7 +514,7 @@ describe('Flex Reducer', () => {
       Parent = () => {
         [state] = useFlexReducer('parent', pReducer, pInitialState)
         pRenders += 1
-        renders.push(state.parent.value)
+        renders.push(state.value)
         return (
           <div>
             <Child parentValue={[...renders]}/>
