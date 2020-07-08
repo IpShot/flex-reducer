@@ -116,6 +116,28 @@ describe('Flex Reducer', () => {
       })
       expect(state.value).toBe('Updated Parent')
     })
+    it('should throw an error if action type is an empty string', () => {
+      rtl.render(<Parent />)
+      expect(() => {
+        rtl.act(() => {
+          dispatch({
+            type: '',
+            payload: 'Updated Parent'
+          })
+        })
+      }).toThrow('Wrong action format.')
+    })
+    it('should throw an error if action type is not a string', () => {
+      rtl.render(<Parent />)
+      expect(() => {
+        rtl.act(() => {
+          dispatch({
+            type: 1,
+            payload: 'Updated Parent'
+          })
+        })
+      }).toThrow('Wrong action format.')
+    })
   })
   describe('useFlexReducer', () => {
     it('should return [state][reducer_name] equal to initial state on initial render', () => {
@@ -466,35 +488,26 @@ describe('Flex Reducer', () => {
       })
       expect(scRenders).toBe(1)
     })
-  })
-  describe('getState', () => {
-    it('should always return current state', () => {
-      expect(getState()).toEqual({});
-      const { result } = renderHook(
-        () => useFlexReducer('parent', pReducer, pInitialState)
-      )
-      expect(getState()).toEqual({ parent: result.current[0] })
-      act(() => {
-        pAction('Bye Parent!')
-      })
-      expect(getState()).toEqual({ parent: result.current[0] })
-    })
-  })
-  describe('uniqueType', () => {
-    it('should throw an error if types are duplicating', () => {
+    it('should throw an error if selector is not a function', () => {
+      SubChild = () => {
+        scState = useSelector('function')
+        return <span />
+      }
       expect(() => {
-        uniqueType('UPDATE_PARENT')
-        uniqueType('UPDATE_PARENT')
-      }).toThrow('The \'UPDATE_PARENT\' action type already exists.')
+        rtl.render(<SubChild />)
+      }).toThrow('Selector must be a function.')
     })
-    it('should not throw an error if types are different', () => {
+    it('should throw an error if equality function is not a function', () => {
+      SubChild = () => {
+        scState = useSelector(() => {}, 'function')
+        return <span />
+      }
       expect(() => {
-        uniqueType('PARENT')
-        uniqueType('CHILD')
-      }).not.toThrow()
+        rtl.render(<SubChild />)
+      }).toThrow('Equality function must be a function.')
     })
   })
-  describe('check if it works well with props', () => {
+  describe('check if useFlexReducer and useSelector work well with props', () => {
     it('should call one render on dispatch and props change happened together', () => {
       SubChild = memo(() => {
         scState = useSelector(s => s.parent.value)
@@ -540,6 +553,50 @@ describe('Flex Reducer', () => {
       expect(cRenders).toBe(3)
       expect(scRenders).toBe(2)
       expect(renders).toEqual(['Hello Parent!', 'Bye Parent!'])
+    })
+  })
+  describe('getState', () => {
+    it('should always return current state', () => {
+      expect(getState()).toEqual({});
+      const { result } = renderHook(
+        () => useFlexReducer('parent', pReducer, pInitialState)
+      )
+      expect(getState()).toEqual({ parent: result.current[0] })
+      act(() => {
+        pAction('Bye Parent!')
+      })
+      expect(getState()).toEqual({ parent: result.current[0] })
+    })
+  })
+  describe('uniqueType', () => {
+    it('should throw an error if types are duplicating', () => {
+      expect(() => {
+        uniqueType('UPDATE_PARENT')
+        uniqueType('UPDATE_PARENT')
+      }).toThrow('The \'UPDATE_PARENT\' action type already exists.')
+    })
+    it('should not throw an error if types are different', () => {
+      expect(() => {
+        uniqueType('PARENT')
+        uniqueType('CHILD')
+      }).not.toThrow()
+    })
+  })
+  describe('shallowEqual', () => {
+    it('should return true if objects equal shallowly', () => {
+      expect(shallowEqual({ a: 'a' }, { a: 'a' })).toBe(true)
+    })
+    it('should return false if objects aren\'t equal shallowly', () => {
+      expect(shallowEqual({ a: 'a', b: 'b' }, { a: 'a', b: 'c' })).toBe(false)
+    })
+    it('should return false if objects key amounts are different', () => {
+      expect(shallowEqual({ a: 'a', b: 'b' }, { a: 'a' })).toBe(false)
+    })
+    it('should return false if any of args isn\'t an object type', () => {
+      expect(shallowEqual({ a: 'a' }, 1)).toBe(false)
+    })
+    it('should return false if any of args is null', () => {
+      expect(shallowEqual(null, { a: 'a' })).toBe(false)
     })
   })
 })
