@@ -18,9 +18,9 @@ const useFlexEffect = typeof window !== 'undefined'
   : useEffect;
 
 function callSelectorDispatch(dispatch) {
-  const { selector, result, render } = dispatch;
+  const { selector, equalityFn, result, render } = dispatch;
   const nextResult = selector(context.state);
-  if (!shallowEqual(result.current, nextResult)) {
+  if (!equalityFn(result.current, nextResult)) {
     result.current = nextResult;
     render(nextResult);
   }
@@ -96,9 +96,16 @@ export function useFlexReducer(reducerName, reducer, initialState, options = { c
   return [context.state, dispatch];
 }
 
-export function useSelector(selector) {
+function refEquality(prev, next) {
+  return prev === next;
+}
+
+export function useSelector(selector, equalityFn = refEquality) {
   if (typeof selector !== 'function') {
     throw new Error('Selector must be a function.');
+  }
+  if (equalityFn && typeof equalityFn !== 'function') {
+    throw new Error('Equality function must be a function.');
   }
 
   const key = useRef();
@@ -114,9 +121,9 @@ export function useSelector(selector) {
   result.current = state;
 
   useFlexEffect(() => {
-    context.dispatch[key.current] = { selector, result, render };
+    context.dispatch[key.current] = { selector, equalityFn, result, render };
     return () => delete context.dispatch[key.current];
-  }, [selector, render, result, key.current, context.dispatch]);
+  }, [selector, equalityFn, render, result, key.current, context.dispatch]);
 
   return state;
 }
