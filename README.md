@@ -1,4 +1,4 @@
-# flex-reducer
+# Flex Reducer
 
 > Inspired by Redux and React Hooks
 
