@@ -9,7 +9,7 @@ Flexible reducer for a React app data management. Use it in a component as a reg
 - Allows to separate data for every logical page, no reducers combining.
 - It doesn't use React context, no need to create and provide it.
 - You can use dispatch out of a component.
-- Small code base just about 120 lines you can figure out easily.
+- Small code base just about 130 lines you can figure out easily.
 
 ## Usage
 ```js
