@@ -490,21 +490,21 @@ describe('Flex Reducer', () => {
     })
     it('should throw an error if selector is not a function', () => {
       SubChild = () => {
-        scState = useSelector('function')
+        expect(() => {
+          scState = useSelector('function')
+        }).toThrow('Selector must be a function.')
         return <span />
       }
-      expect(() => {
-        rtl.render(<SubChild />)
-      }).toThrow('Selector must be a function.')
+      rtl.render(<SubChild />)
     })
     it('should throw an error if equality function is not a function', () => {
       SubChild = () => {
-        scState = useSelector(() => {}, 'function')
+        expect(() => {
+          scState = useSelector(() => {}, 'function')
+        }).toThrow('Equality function must be a function.')
         return <span />
       }
-      expect(() => {
-        rtl.render(<SubChild />)
-      }).toThrow('Equality function must be a function.')
+      rtl.render(<SubChild />)
     })
   })
   describe('check if useFlexReducer and useSelector work well with props', () => {
