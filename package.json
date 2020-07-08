@@ -9,7 +9,8 @@
     "react-hooks",
     "reducer",
     "selector",
-    "data-management"
+    "data",
+    "management"
   ],
   "license": "MIT",
   "author": "Roman Zhernosek <roman@zhernosek.com>",
