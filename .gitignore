@@ -1,3 +1,7 @@
 node_modules
+dist
+lib
+coverage
+es
 .git
 .DS_Store
