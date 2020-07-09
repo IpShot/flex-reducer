@@ -5,3 +5,8 @@ script:
   - npm test
 after_success:
   - npm run coverage
+deploy:
+  provider: npm
+  email: roman@zhernosek.com
+  api_key: $NPM_TOKEN
+  skip_cleanup: true
