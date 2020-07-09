@@ -12,7 +12,8 @@
     "flex-reducer": "^1.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "^3.4.1"
+    "react-scripts": "^3.4.1",
+    "unique-action-types": "^1.0.0"
   },
   "browserslist": {
     "production": [
