@@ -7,7 +7,7 @@ const genKey = () => counter++;
 let cache = {};
 const context = {
   state: {},
-  dispatch: {},
+  dispatch: new Map(),
 };
 
 Object.seal(context);
@@ -17,17 +17,8 @@ const useFlexEffect = typeof window !== 'undefined'
   ? useLayoutEffect
   : useEffect;
 
-function callSelectorDispatch(dispatch) {
-  const { selector, equalityFn, result, render } = dispatch;
-  const nextResult = selector(context.state);
-  if (!equalityFn(result.current, nextResult)) {
-    result.current = nextResult;
-    render(nextResult);
-  }
-}
-
-function callReducerDispatch(dispatch, action) {
-  const { reducerName, reducer, render } = dispatch;
+function callReducerDispatch(disp, action) {
+  const { reducerName, reducer, render } = disp;
   const state = context.state[reducerName];
   const nextState = reducer(state, action);
   if (!shallowEqual(state, nextState)) {
@@ -36,11 +27,20 @@ function callReducerDispatch(dispatch, action) {
   }
 }
 
-function callDispatch(dispatch, action) {
-  if (dispatch.reducerName) {
-    callReducerDispatch(dispatch, action)
+function callSelectorDispatch(disp) {
+  const { selector, equalityFn, result, render } = disp;
+  const nextResult = selector(context.state);
+  if (!equalityFn(result.current, nextResult)) {
+    result.current = nextResult;
+    render(nextResult);
+  }
+}
+
+function callDispatch(disp, action) {
+  if (disp.reducerName) {
+    callReducerDispatch(disp, action)
   } else {
-    callSelectorDispatch(dispatch);
+    callSelectorDispatch(disp);
   }
 }
 
@@ -49,9 +49,9 @@ export function dispatch(action = {}) {
     throw new Error('Wrong action format.');
   }
   batch(() => {
-    Object.keys(context.dispatch).forEach(key =>
-      callDispatch(context.dispatch[key], action)
-    );
+    context.dispatch.forEach(disp => {
+      callDispatch(disp, action);
+    });
   });
 }
 
@@ -65,7 +65,7 @@ export function useFlexReducer(reducerName, reducer, initialState, options = { c
     key.current = genKey();
   }
   const contextState = context.state[reducerName];
-  if (contextState && context.dispatch[key.current]?.reducer !== reducer) {
+  if (contextState && context.dispatch.get(key.current)?.reducer !== reducer) {
     throw new Error(`Component with "${reducerName}" reducer name already in use.`);
   }
 
@@ -74,18 +74,19 @@ export function useFlexReducer(reducerName, reducer, initialState, options = { c
   lastState.current = state;
   context.state[reducerName] = state;
 
+  if (!context.dispatch.has(key.current)) {
+    context.dispatch.set(key.current, {
+      reducerName,
+      reducer,
+      render,
+    });
+  }
+
   useFlexEffect(() => {
-    if (!contextState) {
-      context.dispatch[key.current] = {
-        reducerName,
-        reducer,
-        render,
-      }
-    }
     return () => {
       if (options.cache && !cache[reducerName]) cache[reducerName] = lastState;
       delete context.state[reducerName];
-      delete context.dispatch[key.current];
+      context.dispatch.delete(key.current);
     }
   }, [
     reducer, render, reducerName, cache,
@@ -120,9 +121,12 @@ export function useSelector(selector, equalityFn = refEquality) {
   const result = useRef();
   result.current = state;
 
+  if (!context.dispatch.has(key.current)) {
+    context.dispatch.set(key.current, { selector, equalityFn, result, render });
+  }
+
   useFlexEffect(() => {
-    context.dispatch[key.current] = { selector, equalityFn, result, render };
-    return () => delete context.dispatch[key.current];
+    return () => context.dispatch.delete(key.current);
   }, [selector, equalityFn, render, result, key.current, context.dispatch]);
 
   return state;
@@ -141,5 +145,5 @@ export function reset() {
   counter = 1;
   cache = {};
   context.state = {};
-  context.dispatch = {};
+  context.dispatch = new Map();
 }
