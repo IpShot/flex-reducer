@@ -6,7 +6,7 @@
 [![npm version](https://img.shields.io/npm/v/flex-reducer.svg?style=flat-square)](https://www.npmjs.com/package/flex-reducer)
 [![codecov](https://codecov.io/gh/IpShot/flex-reducer/branch/master/graph/badge.svg)](https://codecov.io/gh/IpShot/flex-reducer)
 
-Flexible reducer for a React app data management. Use it in a component as a regular [useReducer](https://reactjs.org/docs/hooks-reference.html#usereducer) react hook. Its data will be available for all other components via [useSelector](https://react-redux.js.org/next/api/hooks#useselector) hook until the owner component unmounted. You can use multiple reducer and selector hooks without extra renders.
+Flexible reducer for a React app data management. Use it in a component as a regular [useReducer](https://reactjs.org/docs/hooks-reference.html#usereducer) react hook. Its data will be available for all other components via [useSelector](https://react-redux.js.org/next/api/hooks#useselector) hook until the reducer owner component (where `useReducer` was called) unmounted. You can use multiple reducer and selector hooks without extra renders.
 
 ### Advantages over Redux.
 - No global store data available at any time for any component not related to.
@@ -29,12 +29,20 @@ yarn add flex-reducer
 
 ## Usage
 ```js
+import { useFlexReducer, useSelector, dispatch } from 'flex-reducer';
+
 // useFlexReducer
 const [state, dispatch] = useFlexReducer('app', reducer, initialState);
 const todos = state.todos;
 
 // useSelector (equality function is optional)
-const todos = useSelector(state => state.app.todos, equalityFn?)
+const todos = useSelector(state => state.app.todos, equalityFn?);
+
+// dispatch
+const update = (payload) => dispatch({
+  type: 'UPDATE',
+  payload,
+});
 ```
 
 ## Example
