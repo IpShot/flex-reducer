@@ -6,7 +6,6 @@ import {
   useFlexReducer,
   useSelector,
   dispatch,
-  uniqueType,
   shallowEqual,
   getState,
 } from '../src';
@@ -566,20 +565,6 @@ describe('Flex Reducer', () => {
         pAction('Bye Parent!')
       })
       expect(getState()).toEqual({ parent: result.current[0] })
-    })
-  })
-  describe('uniqueType', () => {
-    it('should throw an error if types are duplicating', () => {
-      expect(() => {
-        uniqueType('UPDATE_PARENT')
-        uniqueType('UPDATE_PARENT')
-      }).toThrow('The \'UPDATE_PARENT\' action type already exists.')
-    })
-    it('should not throw an error if types are different', () => {
-      expect(() => {
-        uniqueType('PARENT')
-        uniqueType('CHILD')
-      }).not.toThrow()
     })
   })
   describe('shallowEqual', () => {
