@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useLayoutEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { unstable_batchedUpdates as batch } from './utils/batch';
 import shallowEqual from './utils/shallowEqual';
 
@@ -11,11 +11,6 @@ const context = {
 };
 
 Object.seal(context);
-
-// We use useEffect for server side rendering
-const useFlexEffect = typeof window !== 'undefined'
-  ? useLayoutEffect
-  : useEffect;
 
 function callReducerDispatch(disp, action) {
   const { reducerName, reducer, render } = disp;
@@ -81,7 +76,7 @@ export function useFlexReducer(reducerName, reducer, initialState, options = { c
     });
   }
 
-  useFlexEffect(() => {
+  useEffect(() => {
     return () => {
       if (options.cache && !cache[reducerName]) cache[reducerName] = lastState;
       delete context.state[reducerName];
@@ -124,7 +119,7 @@ export function useSelector(selector, equalityFn = refEquality) {
     context.dispatch.set(key.current, { selector, equalityFn, result, render });
   }
 
-  useFlexEffect(() => {
+  useEffect(() => {
     return () => context.dispatch.delete(key.current);
   }, [key.current, context.dispatch]);
 
