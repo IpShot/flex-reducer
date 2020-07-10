@@ -45,7 +45,7 @@ const updateAction = (payload) => dispatch({
 });
 ```
 
-If you set `cache` to `false` the reducer's data will be reset to initial on the component unmount.
+If you set `cache` to `false` the reducer's data will be reset to initial on the component next mount.
 
 You can use multiple `useFlexReducer` to separate your app data and take it via `useSelector` by its reducer name.
 Let's say a user data should be global and available for every page. Just call `useFlexReducer('user', reducer, initialState)` in your root component and you can use its data in every page component like `const user = useSelector(state => state.user)`. On a user action dispatch the `useFlexReducer` and `useSelector` will call rerender of its components. 
