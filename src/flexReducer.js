@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { unstable_batchedUpdates as batch } from './utils/batch';
 import shallowEqual from './utils/shallowEqual';
 
+const isClient = typeof window !== 'undefined';
 let counter = 1;
 const genKey = () => counter++;
 let cache = {};
@@ -59,7 +60,7 @@ export function useFlexReducer(reducerName, reducer, initialState, options = { c
   if (!key.current) {
     key.current = genKey();
   }
-  if (context.state[reducerName] && context.dispatch.get(key.current)?.reducer !== reducer) {
+  if (isClient && context.state[reducerName] && context.dispatch.get(key.current)?.reducer !== reducer) {
     throw new Error(`Component with "${reducerName}" reducer name already in use.`);
   }
 
