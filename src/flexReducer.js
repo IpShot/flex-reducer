@@ -64,8 +64,7 @@ export function useFlexReducer(reducerName, reducer, initialState, options = { c
   if (!key.current) {
     key.current = genKey();
   }
-  const contextState = context.state[reducerName];
-  if (contextState && context.dispatch.get(key.current)?.reducer !== reducer) {
+  if (context.state[reducerName] && context.dispatch.get(key.current)?.reducer !== reducer) {
     throw new Error(`Component with "${reducerName}" reducer name already in use.`);
   }
 
@@ -89,8 +88,8 @@ export function useFlexReducer(reducerName, reducer, initialState, options = { c
       context.dispatch.delete(key.current);
     }
   }, [
-    reducer, render, reducerName, cache,
-    lastState, options.cache, key.current,
+    reducerName, cache, lastState,
+    options.cache, key.current,
     context.state, context.dispatch,
   ]);
 
@@ -127,7 +126,7 @@ export function useSelector(selector, equalityFn = refEquality) {
 
   useFlexEffect(() => {
     return () => context.dispatch.delete(key.current);
-  }, [selector, equalityFn, render, result, key.current, context.dispatch]);
+  }, [key.current, context.dispatch]);
 
   return state;
 }
