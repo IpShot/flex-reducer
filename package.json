@@ -1,7 +1,7 @@
 {
   "name": "flex-reducer",
   "version": "1.0.4",
-  "description": "Flexible reducer hook for an app state management",
+  "description": "React Hooks based app state manager",
   "keywords": [
     "react",
     "reactjs",
