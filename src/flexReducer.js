@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { unstable_batchedUpdates as batch } from './utils/batch';
 import shallowEqual from './utils/shallowEqual';
 
-const isClient = typeof window !== 'undefined';
 let counter = 1;
 const genKey = () => counter++;
 let cache = {};
