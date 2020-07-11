@@ -410,21 +410,28 @@ describe('Flex Reducer', () => {
       expect(state.value).toBe('Hello Parent!')
       expect(cState.value).toBe('Bye Child!')
     })
+    it('should not throw "reducer already in use" error if one component unmounted and another with the same reducer name is mounted and both happened through the same render', () => {
+      const Child2 = () => {
+        useFlexReducer('child', cReducer, cInitialState)
+        return <div />
+      }
+      Parent = ({ mountChild = true }) => {
+        useFlexReducer('parent', pReducer, pInitialState)
+        return (
+          <div>
+            {mountChild && <Child />}
+            {!mountChild && <Child2 />}
+          </div>
+        )
+      }
+      const { rerender } = rtl.render(<Parent />)
+      rerender(<Parent mountChild={false} />)
+    })
     it('should throw an error if reducer name is missing', () => {
       const { result } = renderHook(
         () => useFlexReducer()
       )
       expect(result.error).not.toBe(undefined)
-    })
-    it('should throw an error if reducer name is duplicating', () => {
-      const { result } = renderHook(
-        () => useFlexReducer('parent', pReducer, pInitialState)
-      )
-      const { result: dResult } = renderHook(
-        () => useFlexReducer('parent', pReducer, pInitialState)
-      )
-      expect(result.error).toBe(undefined)
-      expect(dResult.error).not.toBe(undefined)
     })
     it('should throw an error if reducer is missing', () => {
       const { result } = renderHook(

@@ -6,6 +6,7 @@ const isClient = typeof window !== 'undefined';
 let counter = 1;
 const genKey = () => counter++;
 let cache = {};
+let reducerActiveComponent = new Map();
 const context = {
   state: {},
   dispatch: new Map(),
@@ -59,16 +60,15 @@ export function useFlexReducer(reducerName, reducer, initialState, options = { c
   const key = useRef();
   if (!key.current) {
     key.current = genKey();
-  }
-  if (isClient && context.state[reducerName] && context.dispatch.get(key.current)?.reducer !== reducer) {
-    throw new Error(`Component with "${reducerName}" reducer name already in use.`);
+    reducerActiveComponent.set(reducerName, key.current);
   }
 
-  const [state, render] = useState(options.cache && cache[reducerName]?.current || initialState);
-  const lastState = useRef();
-  lastState.current = state;
+  const [state, render] = useState(options.cache && cache[reducerName] || initialState);
   context.state[reducerName] = state;
 
+  if (options.cache) {
+    cache[reducerName] = state;
+  }
   if (!context.dispatch.has(key.current)) {
     context.dispatch.set(key.current, {
       reducerName,
@@ -79,15 +79,12 @@ export function useFlexReducer(reducerName, reducer, initialState, options = { c
 
   useEffect(() => {
     return () => {
-      if (options.cache && !cache[reducerName]) cache[reducerName] = lastState;
-      delete context.state[reducerName];
       context.dispatch.delete(key.current);
+      if (reducerActiveComponent.get(reducerName) === key.current) {
+        delete context.state[reducerName];
+      }
     }
-  }, [
-    reducerName, cache, lastState,
-    options.cache, key.current,
-    context.state, context.dispatch,
-  ]);
+  }, []);
 
   return [state, dispatch];
 }
@@ -122,7 +119,7 @@ export function useSelector(selector, equalityFn = refEquality) {
 
   useEffect(() => {
     return () => context.dispatch.delete(key.current);
-  }, [key.current, context.dispatch]);
+  }, []);
 
   return state;
 }
@@ -141,4 +138,5 @@ export function reset() {
   cache = {};
   context.state = {};
   context.dispatch = new Map();
+  reducerActiveComponent = new Map();
 }
