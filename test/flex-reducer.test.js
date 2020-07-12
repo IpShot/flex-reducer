@@ -410,7 +410,7 @@ describe('Flex Reducer', () => {
       expect(state.value).toBe('Hello Parent!')
       expect(cState.value).toBe('Bye Child!')
     })
-    it('should not throw "reducer already in use" error if one component unmounted and another with the same reducer name is mounted and both happened through the same render', () => {
+    it('should not throw duplicating error if one component unmounted and another with the same reducer name is mounted and both happened through the same render', () => {
       const Child2 = () => {
         useFlexReducer('child', cReducer, cInitialState)
         return <div />
@@ -432,6 +432,25 @@ describe('Flex Reducer', () => {
         () => useFlexReducer()
       )
       expect(result.error).not.toBe(undefined)
+    })
+    it('should throw an error if reducer name is duplicating on second render', () => {
+      const Child2 = () => {
+        useFlexReducer('child', cReducer, cInitialState)
+        return <div />
+      }
+      Parent = () => {
+        useFlexReducer('parent', pReducer, pInitialState)
+        return (
+          <div>
+            <Child2 />
+            <Child />
+          </div>
+        )
+      }
+      const { rerender } = rtl.render(<Parent />)
+      expect(() => {
+        rerender(<Parent />)
+      }).toThrow('Looks like you\'re trying to use more than one component with the same "child" reducer.')
     })
     it('should throw an error if reducer is missing', () => {
       const { result } = renderHook(

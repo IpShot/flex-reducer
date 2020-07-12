@@ -60,6 +60,8 @@ export function useFlexReducer(reducerName, reducer, initialState, options = { c
   if (!key.current) {
     key.current = genKey();
     reducerActiveComponent.set(reducerName, key.current);
+  } else if (reducerActiveComponent.get(reducerName) !== key.current) {
+    throw new Error(`Looks like you're trying to use more than one component with the same "${reducerName}" reducer.`);
   }
 
   const [state, render] = useState(options.cache && cache[reducerName] || initialState);
