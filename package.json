@@ -4,13 +4,10 @@
   "description": "React Hooks based app state manager",
   "keywords": [
     "react",
-    "reactjs",
-    "react-app",
-    "react-hooks",
-    "reducer",
-    "selector",
-    "data",
-    "store"
+    "app",
+    "state",
+    "manager",
+    "hooks"
   ],
   "license": "MIT",
   "author": "Roman Zhernosek <roman@zhernosek.com>",
