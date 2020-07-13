@@ -1,12 +1,12 @@
 # Flex Reducer
 
-> Inspired by Redux and React Hooks
+> Nice and powerful React app state manager.
 
 [![Build Status](https://travis-ci.com/IpShot/flex-reducer.svg?branch=master)](https://travis-ci.com/IpShot/flex-reducer)
 [![npm version](https://img.shields.io/npm/v/flex-reducer.svg?style=flat-square)](https://www.npmjs.com/package/flex-reducer)
 [![codecov](https://codecov.io/gh/IpShot/flex-reducer/branch/master/graph/badge.svg)](https://codecov.io/gh/IpShot/flex-reducer)
 
-React Hooks based app state manager. Use it in a component as a regular [useReducer](https://reactjs.org/docs/hooks-reference.html#usereducer) react hook. Its data will be available for all other components via [useSelector](https://react-redux.js.org/next/api/hooks#useselector) hook until the reducer owner component (where `useReducer` was called) unmounted. You can use multiple `useFlexReducer` and `useSelector` hooks without extra renders.
+React app state management can be pretty nice. Use `useFlexReducer` in a component as a regular [useReducer](https://reactjs.org/docs/hooks-reference.html#usereducer) react hook. Its data will be available for all other components via [useSelector](https://react-redux.js.org/next/api/hooks#useselector) hook until the reducer owner (component where `useFlexReducer` was called) unmounted. You can use multiple `useFlexReducer` and `useSelector` hooks without extra renders.
 
 ### Advantages over Redux.
 - No global store data always alavailable for any component not related to.
@@ -48,7 +48,7 @@ const updateAction = (payload) => dispatch({
 If you set `cache` to `false` the reducer's data will be reset to initial on the component next mount.
 
 You can use multiple `useFlexReducer` to separate your app data and take it via `useSelector` by its reducer name.
-Let's say a user data should be global and available for every page. Just call `useFlexReducer('user', reducer, initialState)` in your root component and you can use its data in every page component like `const user = useSelector(state => state.user)`. On a user action dispatch the `useFlexReducer` and `useSelector` will call rerender of its components. 
+Let's say a user data should be global and available for every page. Just call `useFlexReducer('user', reducer, initialState)` in your root component and you can use its data in every page component like `const user = useSelector(state => state.user)`. On a user action dispatch the `useFlexReducer` and `useSelector` will call rerender of its components.
 It is very possible that every page also has its own data, just use `useFlexReducer('pageName',...)` in every page component and its data will be available but only if the page has been rendered. This approach allows to avoid using wrong/outdated data from the page/component which isn't at work or mistakenly change its data.
 
 ## Example
