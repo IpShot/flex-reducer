@@ -1,6 +1,6 @@
 # Flex Reducer
 
-> Nice and powerful React app state manager.
+> Nice and flexible React app state manager.
 
 [![Build Status](https://travis-ci.com/IpShot/flex-reducer.svg?branch=master)](https://travis-ci.com/IpShot/flex-reducer)
 [![npm version](https://img.shields.io/npm/v/flex-reducer.svg?style=flat-square)](https://www.npmjs.com/package/flex-reducer)
