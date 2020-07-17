@@ -8,12 +8,12 @@
 
 React app state management can be pretty nice. Use `useFlexReducer` in a component as a regular [useReducer](https://reactjs.org/docs/hooks-reference.html#usereducer) react hook. Its data will be available for all other components via [useSelector](https://react-redux.js.org/next/api/hooks#useselector) hook until the reducer owner (component where `useFlexReducer` was called) unmounted. You can use multiple `useFlexReducer` and `useSelector` hooks without extra renders.
 
-### Advantages over Redux.
-- No global store data always alavailable for any component not related to.
+### Advantages over official Redux.
+- No global store data always available for any component not related to.
 - Allows to separate data for every logical page, no reducers combining.
 - It doesn't use React context, no need to create and provide it.
 - You can use dispatch out of a component.
-- Small code base just about 130 lines you can figure out easily.
+- Small code base just about 130 lines you can figure out.
 
 ## Installation
 
