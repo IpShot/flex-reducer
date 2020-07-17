@@ -1,9 +1,10 @@
 {
   "name": "flex-reducer",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Nice and flexible React app state manager",
   "keywords": [
     "react",
+    "redux",
     "app",
     "state",
     "manager",
