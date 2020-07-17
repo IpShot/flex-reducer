@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "classnames": "^2.2.6",
-    "flex-reducer": "^1.0.5",
+    "flex-reducer": "^1.0.6",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "^3.4.1",
