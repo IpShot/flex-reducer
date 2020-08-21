@@ -11,7 +11,6 @@ React app state management can be pretty nice. Use `useFlexReducer` in a compone
 ### Advantages over official Redux.
 - No global store data always available for any component not related to.
 - Allows to separate data for every logical page, no reducers combining.
-- It doesn't use React context, no need to create and provide it.
 - You can use dispatch out of a component.
 - Small code base just about 130 lines you can figure out.
 
